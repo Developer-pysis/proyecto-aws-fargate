@@ -5,15 +5,26 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Deshabilitar clones superficiales para un análisis preciso
+
+      - name: Cache SonarQube Scanner
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io  # Añadir la URL de SonarCloud
